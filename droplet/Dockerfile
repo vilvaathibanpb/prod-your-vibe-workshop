@@ -1,6 +1,6 @@
-# A fake "fresh DigitalOcean droplet": Ubuntu 24.04 + systemd + sshd, with the same
-# packages and SSH setup as DO's image, and root login with a password
-# (the insecure default we fix in the workshop).
+# A fake "fresh DigitalOcean droplet" created with an SSH key: Ubuntu 24.04 + systemd + sshd,
+# same packages and SSH setup as DO's image. Root logs in with a key only (no root password);
+# droplet.sh installs your codespace's public key when it creates the server.
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -18,10 +18,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          systemd-udevd.service systemd-udev-trigger.service \
     && systemctl enable ssh \
     && rm -f /usr/sbin/policy-rc.d \
-    && echo 'root:vibes' | chpasswd \
+    && passwd -l root >/dev/null \
     # same places DO's image sets these
     && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
-    && printf 'PasswordAuthentication yes\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf \
+    && printf 'PasswordAuthentication no\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf \
     && rm -f /etc/ssh/ssh_host_* \
     && echo 'droplet' > /etc/hostname
 

@@ -17,7 +17,7 @@ check "L1.3 create deploy user" $R "adduser --disabled-password --gecos '' deplo
 check "L1.4 deploy + sudo"      $U "echo pw | sudo -S whoami | grep -qx root"
 # from here, sudo with password via -S; wrap as a function on the remote
 S='echo pw | sudo -S -p ""'
-check "L1.5 hardening drop-in"  $U "$S bash -c \"printf 'PermitRootLogin no\\\\nPasswordAuthentication no\\\\n' > /etc/ssh/sshd_config.d/00-hardening.conf\" && $S sshd -t && $S systemctl restart ssh && $S sshd -T | grep -qx 'permitrootlogin no'"
+check "L1.5 hardening drop-in"  $U "$S bash -c \"printf 'PermitRootLogin no\\\\n' > /etc/ssh/sshd_config.d/00-hardening.conf\" && $S sshd -t && $S systemctl restart ssh && $S sshd -T | grep -qx 'permitrootlogin no'"
 check "L1.6 root refused"       bash -c "! $R true"
 check "L1.6 deploy still works" $U true
 check "L1.7 ufw"                $U "$S ufw default deny incoming && $S ufw default allow outgoing && $S ufw allow OpenSSH && $S ufw --force enable && $S ufw status verbose | grep -q 'Status: active'"

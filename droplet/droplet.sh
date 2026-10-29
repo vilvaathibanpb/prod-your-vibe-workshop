@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 # droplet start | reset | console | status
 # Your practice server: its own IP address, SSH on port 22, 1 GB RAM and 1 CPU,
-# like a $6 DigitalOcean droplet.
+# like a DigitalOcean droplet created with your SSH key.
 set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 NAME=droplet
 NET=dropletnet
 IP=172.20.0.10
+PUBKEY="$HOME/.ssh/id_ed25519.pub"
+
+# Like pasting your public key into DigitalOcean's "Create Droplet" form.
+install_key() {
+  [ -f "$PUBKEY" ] || ssh-keygen -q -t ed25519 -N '' -C "$(whoami)@codespace" -f "${PUBKEY%.pub}"
+  docker exec -i "$NAME" bash -c 'mkdir -p /root/.ssh && chmod 700 /root/.ssh && cat >> /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys' < "$PUBKEY"
+}
 
 start() {
   docker build -q -t droplet:latest "$DIR" >/dev/null   # cached after the first time
@@ -23,8 +30,9 @@ start() {
       --tmpfs /run --tmpfs /run/lock \
       -p 8080:80 -p 8443:443 -p 127.0.0.1:2222:22 \
       droplet:latest >/dev/null
+    install_key
   fi
-  echo "droplet is up · IP $IP · ssh root@$IP (password: vibes)"
+  echo "droplet is up · IP $IP · ssh root@$IP (key: $PUBKEY)"
 }
 
 status() {
