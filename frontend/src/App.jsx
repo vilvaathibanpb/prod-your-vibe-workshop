@@ -51,7 +51,7 @@ export default function App() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
-  const load = () => fetch(API + '/api/ships').then(r => r.json()).then(setShips).catch(() => {})
+  const load = () => fetch(API + '/api/ships').then(r => r.json()).then(d => setShips(Array.isArray(d) ? d : [])).catch(() => {})
 
   useEffect(() => {
     load()
