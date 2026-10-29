@@ -13,14 +13,14 @@ for i in $(seq 30); do docker exec droplet systemctl is-system-running 2>/dev/nu
 # Lab 1.2 ssh-copy-id equivalent
 docker exec droplet bash -c "mkdir -p /root/.ssh && echo '$(cat $KEY.pub)' >> /root/.ssh/authorized_keys && chmod 700 /root/.ssh && chmod 600 /root/.ssh/authorized_keys"
 check "L1.2 ssh root with key"  $R true
-check "L1.3 create deploy user" $R "adduser --disabled-password --gecos '' deploy && echo deploy:pw | chpasswd && usermod -aG sudo deploy && mkdir -p /home/deploy/.ssh && cp ~/.ssh/authorized_keys /home/deploy/.ssh/ && chown -R deploy:deploy /home/deploy/.ssh && chmod 700 /home/deploy/.ssh && chmod 600 /home/deploy/.ssh/authorized_keys"
-check "L1.4 deploy + sudo"      $U "echo pw | sudo -S whoami | grep -qx root"
-# from here, sudo with password via -S; wrap as a function on the remote
+check "L1.1 adduser + sudo group" $R "adduser --disabled-password --gecos '' deploy && echo deploy:pw | chpasswd && usermod -aG sudo deploy"
+check "L1.3 rsync keys to deploy" $R "rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy && stat -c '%U %a' /home/deploy/.ssh | grep -qx 'deploy 700'"
+check "L1.5 ufw allow + enable"   $R "ufw allow OpenSSH && ufw --force enable && ufw status | grep -q 'Status: active'"
+check "L1.6 deploy + sudo"        $U "echo pw | sudo -S whoami | grep -qx root"
+check "L1.8 PermitRootLogin no"   $R "echo 'PermitRootLogin no' > /etc/ssh/sshd_config.d/00-hardening.conf && systemctl restart ssh"
+check "L1.9 root refused"         bash -c "sleep 1; ! $R true"
+check "L1.9 deploy still works"   $U true
 S='echo pw | sudo -S -p ""'
-check "L1.5 hardening drop-in"  $U "$S bash -c \"printf 'PermitRootLogin no\\\\n' > /etc/ssh/sshd_config.d/00-hardening.conf\" && $S sshd -t && $S systemctl restart ssh && $S sshd -T | grep -qx 'permitrootlogin no'"
-check "L1.6 root refused"       bash -c "! $R true"
-check "L1.6 deploy still works" $U true
-check "L1.7 ufw"                $U "$S ufw default deny incoming && $S ufw default allow outgoing && $S ufw allow OpenSSH && $S ufw --force enable && $S ufw status verbose | grep -q 'Status: active'"
 # give deploy passwordless sudo for the rest of the script (interactive sudo isn't scriptable cleanly)
 $U "$S bash -c 'echo \"deploy ALL=(ALL) NOPASSWD:ALL\" > /etc/sudoers.d/zz-test'" >/dev/null 2>&1
 
