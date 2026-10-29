@@ -15,7 +15,7 @@ React India workshop: take a vibe-coded app from localhost to a locked-down, pro
 |---|---|
 | `backend/` | Ship Log API: Express + Postgres (the 🤡 comments are what we fix) |
 | `frontend/` | Ship Log page: React + Vite, built to static files nginx serves |
-| `deploy/` | Finished server configs: systemd unit, nginx sites, `deploy.sh`, GitHub Actions workflow |
+| `.github/workflows/deploy.yml` | Auto-deploy on push (switched off until you set it up) |
 | `droplet/` | The practice Ubuntu server that runs inside your codespace |
 | `.devcontainer/` | Codespace setup |
 

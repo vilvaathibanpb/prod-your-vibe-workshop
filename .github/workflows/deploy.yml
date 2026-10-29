@@ -1,0 +1,30 @@
+# Auto-deploy on every push to main. Switched off until you set up:
+#   repo variable DEPLOY_HOST (server IP), secrets DEPLOY_KEY and DEPLOY_KNOWN_HOSTS.
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    if: ${{ vars.DEPLOY_HOST != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to the server and run the same steps you did by hand
+        env:
+          KEY: ${{ secrets.DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$KEY" > ~/.ssh/id_ed25519
+          echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519
+          ssh deploy@"$HOST" bash -se <<'STEPS'
+            set -e
+            cd ~/shiplog && git pull --ff-only
+            cd backend && npm ci --omit=dev
+            cd ../frontend && npm ci && npm run build
+            cp -r dist/. /var/www/shiplog/
+            pm2 reload shiplog
+          STEPS
