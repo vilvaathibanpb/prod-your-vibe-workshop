@@ -49,7 +49,7 @@ Environment=NODE_ENV=production
 WantedBy=multi-user.target
 UNIT
 check "L2.4 unit running, no DB" $U "sudo systemctl daemon-reload && sudo systemctl enable --now shiplog && sleep 2 && curl -s localhost:3100/api/health | grep -q '\"db\":false'"
-check "L2.5 restarts after kill" $U "sudo systemctl kill -s KILL shiplog; sleep 4; systemctl is-active shiplog && curl -sf localhost:3100/api/health"
+check "L2.5 restarts after kill" $U "sudo systemctl kill --signal=KILL --kill-whom=main shiplog; sleep 4; systemctl is-active shiplog && curl -sf localhost:3100/api/health"
 $U "sudo tee /etc/nginx/sites-available/shiplog >/dev/null" <<'NG'
 server {
     listen 80 default_server;
