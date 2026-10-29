@@ -22,9 +22,13 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh deploy@"$HOST" bash -se <<'STEPS'
             set -e
-            cd ~/shiplog && git pull --ff-only
-            cd backend && npm ci --omit=dev
-            cd ../frontend && npm ci && npm run build
+            cd ~/shiplog
+            git pull --ff-only
+            cd backend
+            npm ci --omit=dev
+            cd ../frontend
+            npm ci
+            npm run build
             cp -r dist/. /var/www/shiplog/
             pm2 reload shiplog
           STEPS
