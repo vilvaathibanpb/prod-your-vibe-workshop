@@ -70,9 +70,6 @@ check "L3 nightly backup (crontab)" $U "echo '0 3 * * * pg_dump shiplog | gzip >
 check "L3 restore drill"            $U "sudo -u postgres pg_dump shiplog > ~/now.sql 2>/dev/null && sudo -u postgres psql -q shiplog -c 'drop table ships' 2>/dev/null && ! curl -sf localhost:3100/api/ships && sudo -u postgres psql -q shiplog < ~/now.sql >/dev/null 2>&1 && curl -s localhost:3100/api/ships | grep -q tester"
 check "L3 only caddy+ssh public"    $U "sudo ss -tlnp | grep -q '127.0.0.1:3100' && sudo ss -tlnp | grep -q '127.0.0.1:5432' && ! sudo ss -tlnp | grep -q '0.0.0.0:3100'"
 
-# ---------- Lab 4 ----------
-check "L4 cloudflared .deb"         $U "cd /tmp && curl -fsSLO https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-\$(dpkg --print-architecture).deb && sudo dpkg -i cloudflared-linux-\$(dpkg --print-architecture).deb >/dev/null && cloudflared --version"
-
 # ---------- Demo: domains + auto-deploy (what can run here) ----------
 check "Demo domains Caddyfile valid" $U "cat > /tmp/Caddyfile.domains <<'CADDY'
 shiplog.bus-music.xyz {

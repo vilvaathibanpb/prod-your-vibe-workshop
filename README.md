@@ -7,7 +7,7 @@ React India workshop: take a vibe-coded app from localhost to a locked-down, pro
 1. **Use this template → Create a new repository** → name it `prod-your-vibe-workshop`, **Private**.
 2. On your copy: **Code → Codespaces → ⋯ → New with options** → 2-core, region Southeast Asia → **Create codespace**.
 3. In the codespace terminal: `droplet status` should print `running`.
-4. Follow [COMMANDS.md](COMMANDS.md): every command, in order (Lab 0 → Lab 4).
+4. Follow [COMMANDS.md](COMMANDS.md): every command, in order (Lab 0 → Lab 3).
 
 ## What's inside
 

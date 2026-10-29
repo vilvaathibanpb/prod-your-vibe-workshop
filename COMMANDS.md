@@ -156,6 +156,8 @@ sudo ufw allow 80,443/tcp
 
 Open the **Ports** tab → port **8080** → 🌐. Ship Log loads (Database ❌ until step 3).
 
+To open it on your phone or share it: in the **Ports** tab, right-click port **8080** → **Port Visibility → Public**. Anyone with the link can open it while your codespace runs.
+
 Optional: crash it on purpose and watch PM2 bring it back:
 
 ```bash
@@ -238,18 +240,6 @@ Optional: see what's listening (only Caddy and ssh face the world):
 ```bash
 sudo ss -tlnp
 ```
-
-## 4 · Share it with the world (bonus)
-
-As **deploy**:
-
-```bash
-curl -fsSLO https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-sudo dpkg -i cloudflared-linux-amd64.deb
-cloudflared tunnel --url http://localhost:80
-```
-
-Open the `https://….trycloudflare.com` link it prints on your phone. Ctrl+C closes it.
 
 ## Helpers
 
