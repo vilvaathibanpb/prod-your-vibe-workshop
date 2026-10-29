@@ -35,7 +35,7 @@ function VibeCheck() {
       <div className="vibe-title">Prod vibe check</div>
       {checks.map(c => (
         <span key={c.label} className={`chip ${c.ok ? 'ok' : 'bad'}`}>
-          {c.ok ? '✅' : '❌'} {c.label}
+          {c.ok ? '🔒' : '🔓'} {c.label}
         </span>
       ))}
       <div className="meta">
