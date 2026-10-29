@@ -1,11 +1,17 @@
-# A fake "fresh DigitalOcean droplet": Ubuntu 24.04 + systemd + sshd,
-# root login with a password (the insecure default we fix in the workshop).
+# A fake "fresh DigitalOcean droplet": Ubuntu 24.04 + systemd + sshd, with the same
+# packages and SSH setup as DO's image, and root login with a password
+# (the insecure default we fix in the workshop).
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+# DO's image is a full server image: no stripped man pages, no extra "ubuntu" user
+RUN rm -f /etc/dpkg/dpkg.cfg.d/excludes \
+    && userdel -r ubuntu 2>/dev/null || true
 RUN apt-get update && apt-get install -y --no-install-recommends \
       systemd systemd-sysv dbus openssh-server sudo ufw iptables \
-      curl ca-certificates nano vim less iproute2 iputils-ping git cron \
+      curl wget ca-certificates gnupg nano vim less man-db iproute2 iputils-ping \
+      git cron rsync unzip htop lsb-release bind9-dnsutils ssh-import-id \
+      unattended-upgrades needrestart apt-utils tzdata bash-completion \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     # don't start things that make no sense in a container
     && systemctl mask systemd-logind.service getty.target console-getty.service \
@@ -13,8 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && systemctl enable ssh \
     && rm -f /usr/sbin/policy-rc.d \
     && echo 'root:vibes' | chpasswd \
+    # same places DO's image sets these
     && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
-    && sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+    && printf 'PasswordAuthentication yes\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf \
     && rm -f /etc/ssh/ssh_host_* \
     && echo 'droplet' > /etc/hostname
 

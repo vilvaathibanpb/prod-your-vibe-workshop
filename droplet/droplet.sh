@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # droplet start | reset | console | status
-# Your practice server. It gets its own IP address and SSH on port 22, like a real DigitalOcean droplet.
+# Your practice server: its own IP address, SSH on port 22, 1 GB RAM and 1 CPU,
+# like a $6 DigitalOcean droplet.
 set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 NAME=droplet
@@ -8,7 +9,7 @@ NET=dropletnet
 IP=172.20.0.10
 
 start() {
-  docker image inspect droplet:latest >/dev/null 2>&1 || docker build -q -t droplet:latest "$DIR"
+  docker build -q -t droplet:latest "$DIR" >/dev/null   # cached after the first time
   docker network inspect "$NET" >/dev/null 2>&1 || docker network create --subnet 172.20.0.0/24 "$NET" >/dev/null
   if docker ps -a --format '{{.Names}}' | grep -qx "$NAME"; then
     docker start "$NAME" >/dev/null
@@ -17,6 +18,7 @@ start() {
     # 127.0.0.1:2222 is only for the automated test scripts; attendees use the IP.
     docker run -d --name "$NAME" --hostname "$NAME" \
       --network "$NET" --ip "$IP" \
+      --memory 1g --memory-swap 1g --cpus 1 \
       --privileged --cgroupns=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
       --tmpfs /run --tmpfs /run/lock \
       -p 8080:80 -p 8443:443 -p 127.0.0.1:2222:22 \
