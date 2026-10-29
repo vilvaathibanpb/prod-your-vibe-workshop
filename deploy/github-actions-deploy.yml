@@ -1,0 +1,22 @@
+# Copy to .github/workflows/deploy.yml in YOUR repo once the three secrets exist:
+#   DEPLOY_KEY (private SSH key for deploy@server), DEPLOY_HOST (server IP), DEPLOY_KNOWN_HOSTS (ssh-keyscan output)
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        env:
+          KEY: ${{ secrets.DEPLOY_KEY }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$KEY" > ~/.ssh/id_ed25519
+          echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519
+          ssh deploy@"$HOST" ./deploy.sh

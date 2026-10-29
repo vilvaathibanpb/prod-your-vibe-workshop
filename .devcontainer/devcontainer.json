@@ -1,0 +1,31 @@
+{
+  "name": "Prod Your Vibe",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "hostRequirements": {
+    "cpus": 2
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash droplet/droplet.sh start",
+  "forwardPorts": [
+    8080,
+    8443
+  ],
+  "portsAttributes": {
+    "8080": {
+      "label": "droplet :80 (http)"
+    },
+    "8443": {
+      "label": "droplet :443 (https)"
+    },
+    "2222": {
+      "label": "droplet ssh",
+      "onAutoForward": "ignore"
+    }
+  }
+}

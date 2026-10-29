@@ -1,0 +1,14 @@
+{
+  "name": "shiplog-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db": "docker compose up -d db",
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
